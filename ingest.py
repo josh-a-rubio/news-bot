@@ -24,22 +24,99 @@ NOTION_HEADERS = {
 RSS_HEADERS = {"User-Agent": "Mozilla/5.0"}
 
 # RSS blog feeds
-RSS_FEED_URL = "https://www.theverge.com/rss/index.xml"
+RSS_FEEDS = {
+   # General Tech News
+    "The Verge": "https://www.theverge.com/rss/index.xml",
+    "Ars Technica": "https://feeds.arstechnica.com/arstechnica/index",
+    "TechCrunch": "https://techcrunch.com/feed/",
+    "Wired": "https://www.wired.com/feed/rss",
+    
+    # Cloud Platforms & Services
+    "AWS Blog": "https://aws.amazon.com/blogs/aws/feed/",
+    "AWS Architecture": "https://aws.amazon.com/blogs/architecture/feed/",
+    "AWS Security": "https://aws.amazon.com/blogs/security/feed/",
+    "Google Cloud Platform": "https://cloudblog.withgoogle.com/products/gcp/rss",
+    "Cloudflare Blog": "https://blog.cloudflare.com/rss/",
+    "Fly.io Blog": "https://fly.io/blog/feed.xml",
+    
+    # Infrastructure & Architecture
+    "InfoQ Architecture": "https://feed.infoq.com/architecture-design",
+    "Airbnb Engineering": "https://medium.com/feed/airbnb-engineering",
+    "Meta Engineering": "https://engineering.fb.com/feed/",
+    "Slack Engineering": "https://slack.engineering/feed/",
+    "Spotify Engineering": "https://engineering.atspotify.com/feed/",
+    
+    # AI & Machine Learning
+    "OpenAI Blog": "https://openai.com/blog/rss.xml",
+    "Google AI Blog": "https://blog.research.google/feeds/posts/default",
+    "DeepMind Blog": "https://deepmind.google/blog/rss.xml",
+    "Hugging Face Blog": "https://huggingface.co/blog/feed.xml",
+    "LangChain Blog": "https://blog.langchain.dev/rss/",
+}
 
-# Parse RSS feed
-response = requests.get(RSS_FEED_URL, headers=RSS_HEADERS)
-feed = feedparser.parse(response.text)
-print("HTTP status:", response.status_code)
+#Map to predifined categories as infra, cloud, or AI
+FEED_CATEGORIES = {
+    # General Tech News
+    "The Verge": "General Tech",
+    "Ars Technica": "General Tech",
+    "TechCrunch": "General Tech",
+    "Wired": "General Tech",
+    
+    # Cloud
+    "AWS Blog": "Cloud",
+    "AWS Architecture": "Cloud",
+    "AWS Security": "Cloud",
+    "Google Cloud Platform": "Cloud",
+    "Cloudflare Blog": "Cloud",
+    "Fly.io Blog": "Cloud",
+    
+    # Infra
+    "InfoQ Architecture": "Infra",
+    "Airbnb Engineering": "Infra",
+    "Meta Engineering": "Infra",
+    "Slack Engineering": "Infra",
+    "Spotify Engineering": "Infra",
+    
+    # AI
+    "OpenAI Blog": "AI",
+    "Google AI Blog": "AI",
+    "DeepMind Blog": "AI",
+    "Hugging Face Blog": "AI",
+    "LangChain Blog": "AI",
+}
 
+# Parse all RSS feeds
+all_entries = []
+MAX_ARTICLES_PER_FEED = 3
 
+for source_name, feed_url in RSS_FEEDS.items():
+    print(f"\n📰 Fetching {source_name}...")
+    try:
+        response = requests.get(feed_url, headers=RSS_HEADERS, timeout=10)
+        if response.status_code == 200:
+            feed = feedparser.parse(response.text)
 
-# Debug: check entries
-print(f"Found {len(feed.entries)} entries in feed")
-for i, entry in enumerate(feed.entries[:5]):  # show first 5 for sanity
-    print(f"{i+1}. Title: {getattr(entry, 'title', 'Untitled')}")
-    print(f"   URL: {getattr(entry, 'link', 'No URL')}")
-    print("-" * 20)
+            if not feed.entries:
+                print(f"   ✓ Found 0 entries (skipping)")
+                continue
 
+            recent_entries = feed.entries[:MAX_ARTICLES_PER_FEED]
+            print(f"   ✓ Found {len(feed.entries)} entries (taking {len(recent_entries)})")
+            
+            # Add source name to each entry for tracking
+            for entry in recent_entries:
+
+                if hasattr(entry, '__dict__'):
+                    entry.source = source_name
+                    all_entries.append(entry)
+        else:
+            print(f"   ✗ HTTP {response.status_code}")
+    except Exception as e:
+        print(f"   ✗ Error: {e}")
+
+print(f"\n{'='*40}")
+print(f"Total entries from all feeds: {len(all_entries)}")
+print(f"{'='*40}\n")
 
 # Fetch existing articles from Notion
 def get_existing_urls():
@@ -83,20 +160,27 @@ def add_article_to_notion_from_rss(entry):
     """Add an article to Notion database."""
     title = getattr(entry, 'title', 'Untitled')
     url = getattr(entry, 'link', None)
-
+    source = getattr(entry, 'source', 'Unknown')
 
     if not url:
         print(f"Skipping entry without URL: {title}")
         return False
+    
+    category = FEED_CATEGORIES.get(source, None)
+
+    properties = {
+        "Title": {"title": [{"text": {"content": title}}]},
+        "URL": {"url": url},
+        "Selected": {"checkbox": False},
+        "Added Date": {"date": {"start": datetime.now(timezone.utc).isoformat()}},
+    }
+
+    if category:
+        properties["Topic"] = {"select": {"name": category}}
 
     data = {
         "parent": {"database_id": DATABASE_ID},
-        "properties": {
-            "Title": {"title": [{"text": {"content": title}}]},
-            "URL": {"url": url},
-            "Selected": {"checkbox": False},
-            "Added Date": {"date": {"start": datetime.now(timezone.utc).isoformat()}},
-        }
+        "properties": properties
     }
 
     #Send request to Notion
@@ -107,7 +191,8 @@ def add_article_to_notion_from_rss(entry):
     )
 
     if response.status_code == 200:
-        print(f"✓ Added: {title}")
+        category_label = f"[{category}]" if category else "[Uncategorized]"
+        print(f"✓ Added {category_label}: {title}")
         return True
     else:
         print(f"✗ Error adding: {title}")
@@ -119,9 +204,10 @@ def add_article_to_notion_from_rss(entry):
 added_count = 0
 skipped_count = 0
 
-for entry in feed.entries:
+for entry in all_entries:
     url = getattr(entry, "link", None)
     title = getattr(entry, 'title', 'Untitled')
+    source = getattr(entry, 'source', 'Unknown')
 
     if url in existing_urls:
         print(f"⊝ Skipping (already exists): {title}")
