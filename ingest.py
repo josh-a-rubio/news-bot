@@ -25,14 +25,14 @@ NOTION_HEADERS = {
 RSS_HEADERS = {"User-Agent": "Mozilla/5.0"}
 
 # RSS blog feeds
-RSS_FEEDS = {
-   # General Tech News
+RSS_FEEDS = RSS_FEEDS = {
+    # General Tech (4)
     "The Verge": "https://www.theverge.com/rss/index.xml",
     "Ars Technica": "https://feeds.arstechnica.com/arstechnica/index",
     "TechCrunch": "https://techcrunch.com/feed/",
     "Wired": "https://www.wired.com/feed/rss",
     
-    # Cloud Platforms & Services
+    # Cloud (6)
     "AWS Blog": "https://aws.amazon.com/blogs/aws/feed/",
     "AWS Architecture": "https://aws.amazon.com/blogs/architecture/feed/",
     "AWS Security": "https://aws.amazon.com/blogs/security/feed/",
@@ -40,14 +40,15 @@ RSS_FEEDS = {
     "Cloudflare Blog": "https://blog.cloudflare.com/rss/",
     "Fly.io Blog": "https://fly.io/blog/feed.xml",
     
-    # Infrastructure & Architecture
+    # Infrastructure (6)
     "InfoQ Architecture": "https://feed.infoq.com/architecture-design",
     "Airbnb Engineering": "https://medium.com/feed/airbnb-engineering",
     "Meta Engineering": "https://engineering.fb.com/feed/",
     "Slack Engineering": "https://slack.engineering/feed/",
     "Spotify Engineering": "https://engineering.atspotify.com/feed/",
+    "Stripe Engineering": "https://stripe.com/blog/feed.rss",
     
-    # AI & Machine Learning
+    # AI (6)
     "OpenAI Blog": "https://openai.com/blog/rss.xml",
     "Google AI Blog": "https://blog.research.google/feeds/posts/default",
     "DeepMind Blog": "https://deepmind.google/blog/rss.xml",
@@ -55,9 +56,9 @@ RSS_FEEDS = {
     "LangChain Blog": "https://blog.langchain.dev/rss/",
 }
 
-#Map to predifined categories as infra, cloud, or AI
+#Predifined categories as infra, cloud, or AI
 FEED_CATEGORIES = {
-    # General Tech News
+    # General Tech
     "The Verge": "General Tech",
     "Ars Technica": "General Tech",
     "TechCrunch": "General Tech",
@@ -77,6 +78,7 @@ FEED_CATEGORIES = {
     "Meta Engineering": "Infra",
     "Slack Engineering": "Infra",
     "Spotify Engineering": "Infra",
+    "Stripe Engineering": "Infra",
     
     # AI
     "OpenAI Blog": "AI",
