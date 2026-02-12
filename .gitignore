@@ -1,3 +1,4 @@
 #git ignore API keys
 .env
-
+logs/
+*.log

@@ -9,10 +9,11 @@ from datetime import datetime, timezone
 load_dotenv()
 
 NOTION_TOKEN = os.getenv("NOTION_TOKEN")
-DATABASE_ID = os.getenv("NOTION_DATABASE_ID")
+ARTICLES_DATABASE_ID = os.getenv("ARTICLES_DATABASE_ID")
+SUBSCRIBERS_DATABASE_ID = os.getenv("SUBSCRIBERS_DATABASE_ID")
 
-if not NOTION_TOKEN or not  DATABASE_ID:
-    raise ValueError("NOTION_TOKEN or NOTION_DATABASE_ID is missing in .env")
+if not NOTION_TOKEN or not ARTICLES_DATABASE_ID:
+    raise ValueError("NOTION_TOKEN or ARTICLES_DATABASE_ID is missing in .env")
 
 #Notion API headers
 NOTION_HEADERS = {
@@ -90,18 +91,18 @@ all_entries = []
 MAX_ARTICLES_PER_FEED = 3
 
 for source_name, feed_url in RSS_FEEDS.items():
-    print(f"\n📰 Fetching {source_name}...")
+    print(f"\nFetching {source_name}...")
     try:
         response = requests.get(feed_url, headers=RSS_HEADERS, timeout=10)
         if response.status_code == 200:
             feed = feedparser.parse(response.text)
 
             if not feed.entries:
-                print(f"   ✓ Found 0 entries (skipping)")
+                print(f"   Found 0 entries (skipping)")
                 continue
 
             recent_entries = feed.entries[:MAX_ARTICLES_PER_FEED]
-            print(f"   ✓ Found {len(feed.entries)} entries (taking {len(recent_entries)})")
+            print(f"   Found {len(feed.entries)} entries (taking {len(recent_entries)})")
             
             # Add source name to each entry for tracking
             for entry in recent_entries:
@@ -110,9 +111,9 @@ for source_name, feed_url in RSS_FEEDS.items():
                     entry.source = source_name
                     all_entries.append(entry)
         else:
-            print(f"   ✗ HTTP {response.status_code}")
+            print(f"   HTTP {response.status_code}")
     except Exception as e:
-        print(f"   ✗ Error: {e}")
+        print(f"   Error: {e}")
 
 print(f"\n{'='*40}")
 print(f"Total entries from all feeds: {len(all_entries)}")
@@ -121,7 +122,7 @@ print(f"{'='*40}\n")
 # Fetch existing articles from Notion
 def get_existing_urls():
     url_list = []
-    query_url = f"https://api.notion.com/v1/databases/{DATABASE_ID}/query"
+    query_url = f"https://api.notion.com/v1/databases/{ARTICLES_DATABASE_ID}/query"
     has_more = True
     start_cursor = None
 
@@ -179,7 +180,7 @@ def add_article_to_notion_from_rss(entry):
         properties["Topic"] = {"select": {"name": category}}
 
     data = {
-        "parent": {"database_id": DATABASE_ID},
+        "parent": {"database_id": ARTICLES_DATABASE_ID},
         "properties": properties
     }
 
@@ -195,7 +196,7 @@ def add_article_to_notion_from_rss(entry):
         print(f"✓ Added {category_label}: {title}")
         return True
     else:
-        print(f"✗ Error adding: {title}")
+        print(f"  Error adding: {title}")
         print(f"  Status code: {response.status_code}")
         print(f"  Response: {response.text}")
         return False
@@ -210,7 +211,7 @@ for entry in all_entries:
     source = getattr(entry, 'source', 'Unknown')
 
     if url in existing_urls:
-        print(f"⊝ Skipping (already exists): {title}")
+        print(f"Skipping (already exists): {title}")
         skipped_count += 1
     else:
         if add_article_to_notion_from_rss(entry):
