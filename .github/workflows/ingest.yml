@@ -36,12 +36,3 @@ jobs:
           SUBSCRIBERS_DATABASE_ID: ${{ secrets.SUBSCRIBERS_DATABASE_ID }}
         run: |
           python ingest.py
-      
-      - name: Upload logs (if script creates them)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ingestion-logs
-          path: logs/
-          retention-days: 7
-        continue-on-error: true
