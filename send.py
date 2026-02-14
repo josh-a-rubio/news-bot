@@ -109,8 +109,17 @@ def build_email_html(articles, token):
         topics[topic].append({"title": title, "url": url, "image": og_image})
 
     # Build topic sections in order
+    # Build topic sections in fixed order
+    topic_order = ["General Tech", "Infra", "Cloud", "AI"]
+
     sections = ""
-    for topic, items in topics.items():
+
+    for topic in topic_order:
+        if topic not in topics:
+            continue
+
+        items = topics[topic]
+
         articles_html = ""
         for item in items:
             articles_html += f'''
