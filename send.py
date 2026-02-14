@@ -188,19 +188,19 @@ def build_email_html(articles, token):
                 <!-- Articles -->
                 {sections}
 
-                </div>
-
-                <!-- Footer outside card -->
-                <p style="font-size: 0.75rem; color: #999; text-align: center; 
-                        margin-top: 1rem; line-height: 1.8;">
-                    You're receiving this because you subscribed to SysJosh Weekly.<br>
-                    <a href="{unsubscribe_url}" style="color: #999;">Unsubscribe</a>
-                </p>
-
             </div>
-        </body>
-        </html>
-        """
+
+            <!-- Footer outside card -->
+            <p style="font-size: 0.75rem; color: #999; text-align: center; 
+                    margin-top: 1rem; line-height: 1.8;">
+                You're receiving this because you subscribed to SysJosh Weekly.<br>
+                <a href="{unsubscribe_url}" style="color: #999;">Unsubscribe</a>
+            </p>
+
+        </div>
+    </body>
+    </html>
+    """
     return html
 
 def send_email(to_email, html):
