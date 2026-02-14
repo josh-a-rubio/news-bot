@@ -103,16 +103,18 @@ def build_email_html(articles, token):
         og_image = get_og_image(url)
 
         # Skip article if no image
-        if not og_image:
-            continue
 
         if topic not in topics:
             topics[topic] = []
         topics[topic].append({"title": title, "url": url, "image": og_image})
 
     # Build topic sections in order
+    TOPIC_ORDER = ["General Tech", "Infrastructure", "Cloud", "AI"]
     sections = ""
-    for topic, items in topics.items():
+    for topic in TOPIC_ORDER:
+        items = topics.get(topic, [])
+        if not items:
+            continue
         articles_html = ""
         for item in items:
             articles_html += f'''
@@ -121,13 +123,13 @@ def build_email_html(articles, token):
                               font-size: 0.95rem; font-weight: 600; line-height: 1.4;">
                         {item["title"]}
                     </a>
-                    <div style="margin-top: 0.6rem;">
+                    {f'''<div style="margin-top: 0.6rem;">
                         <a href="{item["url"]}">
                             <img src="{item["image"]}" alt="{item["title"]}"
                                  style="width: 100%; max-width: 100%; border-radius: 8px; 
                                         display: block; border: 1px solid #e5e5e5;"/>
                         </a>
-                    </div>
+                    </div>''' if item.get("image") else ""}
                 </div>
             '''
 
