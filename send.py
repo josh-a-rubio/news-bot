@@ -165,12 +165,9 @@ def build_email_html(articles, token):
                                   color: #111; letter-spacing: -0.02em;">
                             SysJosh Weekly
                         </p>
-                        <p style="margin: 0; font-size: 0.7rem; color: #999;">
-                            Your Sunday morning tech briefing
-                        </p>
+                        <p style="margin: 0; font-size: 0.7rem; color: #999;">{date_str}</p>
                     </div>
                 </div>
-                <p style="margin: 0; font-size: 0.7rem; color: #999;">{date_str}</p>
             </div>
 
             <!-- Main Card -->
@@ -187,15 +184,12 @@ def build_email_html(articles, token):
                 <!-- Articles -->
                 {sections}
 
-                <div style="height: 1px; background: #e5e5e5; margin-bottom: 1.25rem;"></div>
-
                 <!-- Footer -->
                 <p style="font-size: 0.75rem; color: #bbb; margin: 0; line-height: 1.8;">
                     You're receiving this because you subscribed to SysJosh Weekly.<br>
                     <a href="{unsubscribe_url}" style="color: #bbb;">Unsubscribe</a>
                 </p>
             </div>
-
         </div>
     </body>
     </html>
