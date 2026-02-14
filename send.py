@@ -3,6 +3,8 @@ import smtplib
 import requests
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from datetime import datetime
+from html.parser import HTMLParser
 from dotenv import dotenv_values
 
 # Load env
@@ -19,6 +21,26 @@ NOTION_HEADERS = {
     "Content-Type": "application/json",
     "Notion-Version": "2022-06-28",
 }
+
+class OGImageParser(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.og_image = None
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "meta":
+            attrs_dict = dict(attrs)
+            if attrs_dict.get("property") == "og:image":
+                self.og_image = attrs_dict.get("content")
+
+def get_og_image(url):
+    try:
+        res = requests.get(url, timeout=5, headers={"User-Agent": "Mozilla/5.0"})
+        parser = OGImageParser()
+        parser.feed(res.text)
+        return parser.og_image
+    except Exception:
+        return None
 
 def get_selected_articles():
     res = requests.post(
@@ -65,46 +87,60 @@ def get_subscriber_email_and_token(sub):
     return email, token
 
 def build_email_html(articles, token):
-    from datetime import datetime
     date_str = datetime.now().strftime("%B %d, %Y")
 
-    # Group by topic
+    # Group by topic and fetch og:images
     topics = {}
     for article in articles:
         props = article["properties"]
         title_list = props.get("Title", {}).get("title", [])
         title = title_list[0]["text"]["content"] if title_list else "Untitled"
         url = props.get("URL", {}).get("url", "#")
-        topic_list = props.get("Topic", {}).get("select", {})
-        topic = topic_list.get("name", "General") if topic_list else "General"
+        topic_obj = props.get("Topic", {}).get("select", {})
+        topic = topic_obj.get("name", "General") if topic_obj else "General"
+
+        # Fetch og:image
+        og_image = get_og_image(url)
+
+        # Skip article if no image
+        if not og_image:
+            continue
 
         if topic not in topics:
             topics[topic] = []
-        topics[topic].append({"title": title, "url": url})
+        topics[topic].append({"title": title, "url": url, "image": og_image})
 
     # Build topic sections
     sections = ""
     for topic, items in topics.items():
-        links = "".join(
-            f'''
-            <li style="margin-bottom: 0.6rem;">
-                <a href="{item["url"]}" 
-                   style="color: #111; text-decoration: none; font-size: 0.95rem; line-height: 1.5;">
-                   {item["title"]}
-                </a>
-            </li>
+        articles_html = ""
+        for item in items:
+            articles_html += f'''
+                <div style="margin-bottom: 1.5rem;">
+                    <a href="{item["url"]}" style="color: #111; text-decoration: none; 
+                              font-size: 0.95rem; font-weight: 600; line-height: 1.4;">
+                        {item["title"]}
+                    </a>
+                    <div style="margin-top: 0.6rem;">
+                        <a href="{item["url"]}">
+                            <img src="{item["image"]}" alt="{item["title"]}"
+                                 style="width: 100%; max-width: 100%; border-radius: 8px; 
+                                        display: block; border: 1px solid #e5e5e5;"/>
+                        </a>
+                    </div>
+                </div>
             '''
-            for item in items
-        )
+
         sections += f'''
             <div style="margin-bottom: 2rem;">
-                <p style="font-size: 0.7rem; font-weight: 600; color: #4A90D9; 
-                          text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.75rem;">
-                    {topic}
-                </p>
-                <ul style="list-style: none; padding: 0; margin: 0;">
-                    {links}
-                </ul>
+                <div style="margin-bottom: 1rem;">
+                    <span style="display: inline-block; padding: 0.2rem 0.75rem;
+                                 background: rgba(74,144,217,0.12); border-radius: 100px;
+                                 font-size: 0.75rem; color: #4A90D9; font-weight: 600;">
+                        {topic}
+                    </span>
+                </div>
+                {articles_html}
             </div>
         '''
 
@@ -113,36 +149,48 @@ def build_email_html(articles, token):
     html = f"""
     <!DOCTYPE html>
     <html>
-    <body style="margin: 0; padding: 0; background: #f5f5f5; font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;">
-        <div style="max-width: 600px; margin: 2rem auto; padding: 1rem;">
+    <body style="margin: 0; padding: 0; background: #f5f5f5; 
+                 font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 2rem 1rem;">
 
-            <!-- Header -->
-            <div style="display: flex; align-items: center; margin-bottom: 1.5rem; padding: 0 0.5rem;">
-                <span style="font-size: 1.75rem; margin-right: 0.75rem;">🫙</span>
-                <div>
-                    <p style="margin: 0; font-size: 1rem; font-weight: 700; color: #111;">SysJosh Weekly</p>
-                    <p style="margin: 0; font-size: 0.7rem; color: #999;">{date_str}</p>
+            <!-- Header Banner -->
+            <div style="background: #fff; border: 1px solid #e5e5e5; border-radius: 12px;
+                        padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+                        box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+                        display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <span style="font-size: 1.5rem;">🫙</span>
+                    <div>
+                        <p style="margin: 0; font-size: 1rem; font-weight: 700; 
+                                  color: #111; letter-spacing: -0.02em;">
+                            SysJosh Weekly
+                        </p>
+                        <p style="margin: 0; font-size: 0.7rem; color: #999;">
+                            Your Sunday morning tech briefing
+                        </p>
+                    </div>
                 </div>
+                <p style="margin: 0; font-size: 0.7rem; color: #999;">{date_str}</p>
             </div>
 
-            <!-- Card -->
-            <div style="background: #fff; border: 1px solid #e5e5e5; border-radius: 12px; 
-                        padding: 2rem; box-shadow: 0 4px 24px rgba(0,0,0,0.06);">
+            <!-- Main Card -->
+            <div style="background: #fff; border: 1px solid #e5e5e5; border-radius: 12px;
+                        padding: 2rem 1.5rem; box-shadow: 0 4px 24px rgba(0,0,0,0.06);">
 
                 <!-- Intro -->
-                <p style="font-size: 0.95rem; color: #111; margin: 0 0 1.75rem; line-height: 1.6;">
+                <p style="font-size: 0.95rem; color: #111; margin: 0 0 1.5rem; line-height: 1.6;">
                     Happy Sunday! Here's this week's picks. ☕
                 </p>
 
                 <div style="height: 1px; background: #e5e5e5; margin-bottom: 1.75rem;"></div>
 
-                <!-- Articles by topic -->
+                <!-- Articles -->
                 {sections}
 
-                <div style="height: 1px; background: #e5e5e5; margin-top: 0.5rem; margin-bottom: 1.5rem;"></div>
+                <div style="height: 1px; background: #e5e5e5; margin-bottom: 1.25rem;"></div>
 
                 <!-- Footer -->
-                <p style="font-size: 0.75rem; color: #bbb; margin: 0; line-height: 1.6;">
+                <p style="font-size: 0.75rem; color: #bbb; margin: 0; line-height: 1.8;">
                     You're receiving this because you subscribed to SysJosh Weekly.<br>
                     <a href="{unsubscribe_url}" style="color: #bbb;">Unsubscribe</a>
                 </p>
@@ -157,7 +205,7 @@ def build_email_html(articles, token):
 def send_email(to_email, html):
     msg = MIMEMultipart("alternative")
     msg["Subject"] = "SysJosh Weekly — Your Sunday Tech Briefing"
-    msg["From"] = f"SysJosh Weekly <{GMAIL_USER}>"
+    msg["From"] = f"SysJosh Weekly (no-reply) <{GMAIL_USER}>"
     msg["To"] = to_email
     msg.attach(MIMEText(html, "html"))
 
