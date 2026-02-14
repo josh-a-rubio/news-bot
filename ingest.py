@@ -5,12 +5,11 @@ import time
 from dotenv import load_dotenv
 from datetime import datetime, timezone
 
-#Load environmnet variables from .env
+#Load environment variables from .env
 load_dotenv()
 
 NOTION_TOKEN = os.getenv("NOTION_TOKEN")
 ARTICLES_DATABASE_ID = os.getenv("ARTICLES_DATABASE_ID")
-SUBSCRIBERS_DATABASE_ID = os.getenv("SUBSCRIBERS_DATABASE_ID")
 
 if not NOTION_TOKEN or not ARTICLES_DATABASE_ID:
     raise ValueError("NOTION_TOKEN or ARTICLES_DATABASE_ID is missing in .env")
@@ -56,7 +55,7 @@ RSS_FEEDS = RSS_FEEDS = {
     "LangChain Blog": "https://blog.langchain.dev/rss/",
 }
 
-#Predifined categories as infra, cloud, or AI
+#Predifined categories as General Tech,Infra, Cloud, or AI
 FEED_CATEGORIES = {
     # General Tech
     "The Verge": "General Tech",
@@ -158,7 +157,7 @@ print("\nFetching existing URLs from Notion...")
 existing_urls = get_existing_urls()
 print(f"Found {len(existing_urls)} existing articles in Notion\n")
 
-# Parse RSS feed
+# Add a single article entry to notion
 def add_article_to_notion_from_rss(entry):
     """Add an article to Notion database."""
     title = getattr(entry, 'title', 'Untitled')
