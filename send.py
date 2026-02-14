@@ -123,13 +123,7 @@ def build_email_html(articles, token):
                               font-size: 0.95rem; font-weight: 600; line-height: 1.4;">
                         {item["title"]}
                     </a>
-                    {f'''<div style="margin-top: 0.6rem;">
-                        <a href="{item["url"]}">
-                            <img src="{item["image"]}" alt="{item["title"]}"
-                                 style="width: 100%; max-width: 100%; border-radius: 8px; 
-                                        display: block; border: 1px solid #e5e5e5;"/>
-                        </a>
-                    </div>''' if item.get("image") else ""}
+                    {('<div style="margin-top: 0.6rem;"><a href="' + item["url"] + '"><img src="' + (item["image"] or "") + '" style="width: 100%; max-width: 100%; border-radius: 8px; display: block; border: 1px solid #e5e5e5;"/></a></div>') if item.get("image") else ""}
                 </div>
             '''
 
