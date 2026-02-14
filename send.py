@@ -65,6 +65,9 @@ def get_subscriber_email_and_token(sub):
     return email, token
 
 def build_email_html(articles, token):
+    from datetime import datetime
+    date_str = datetime.now().strftime("%B %d, %Y")
+
     # Group by topic
     topics = {}
     for article in articles:
@@ -79,29 +82,75 @@ def build_email_html(articles, token):
             topics[topic] = []
         topics[topic].append({"title": title, "url": url})
 
-    # Build HTML
+    # Build topic sections
     sections = ""
     for topic, items in topics.items():
         links = "".join(
-            f'<li><a href="{item["url"]}">{item["title"]}</a></li>'
+            f'''
+            <li style="margin-bottom: 0.6rem;">
+                <a href="{item["url"]}" 
+                   style="color: #111; text-decoration: none; font-size: 0.95rem; line-height: 1.5;">
+                   {item["title"]}
+                </a>
+            </li>
+            '''
             for item in items
         )
-        sections += f"<h3>{topic}</h3><ul>{links}</ul>"
+        sections += f'''
+            <div style="margin-bottom: 2rem;">
+                <p style="font-size: 0.7rem; font-weight: 600; color: #4A90D9; 
+                          text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.75rem;">
+                    {topic}
+                </p>
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                    {links}
+                </ul>
+            </div>
+        '''
 
     unsubscribe_url = f"{BASE_URL}/unsubscribe?token={token}"
 
     html = f"""
-    <div style="font-family: Inter, sans-serif; max-width: 600px; margin: 0 auto; padding: 2rem;">
-        <h2>🫙 SysJosh Weekly</h2>
-        <p>Your Sunday morning tech briefing</p>
-        <hr>
-        {sections}
-        <hr>
-        <p style="font-size: 0.75rem; color: #bbb;">
-            You're receiving this because you subscribed to SysJosh Weekly.<br>
-            <a href="{unsubscribe_url}" style="color: #bbb;">Unsubscribe</a>
-        </p>
-    </div>
+    <!DOCTYPE html>
+    <html>
+    <body style="margin: 0; padding: 0; background: #f5f5f5; font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;">
+        <div style="max-width: 600px; margin: 2rem auto; padding: 1rem;">
+
+            <!-- Header -->
+            <div style="display: flex; align-items: center; margin-bottom: 1.5rem; padding: 0 0.5rem;">
+                <span style="font-size: 1.75rem; margin-right: 0.75rem;">🫙</span>
+                <div>
+                    <p style="margin: 0; font-size: 1rem; font-weight: 700; color: #111;">SysJosh Weekly</p>
+                    <p style="margin: 0; font-size: 0.7rem; color: #999;">{date_str}</p>
+                </div>
+            </div>
+
+            <!-- Card -->
+            <div style="background: #fff; border: 1px solid #e5e5e5; border-radius: 12px; 
+                        padding: 2rem; box-shadow: 0 4px 24px rgba(0,0,0,0.06);">
+
+                <!-- Intro -->
+                <p style="font-size: 0.95rem; color: #111; margin: 0 0 1.75rem; line-height: 1.6;">
+                    Happy Sunday! Here's this week's picks. ☕
+                </p>
+
+                <div style="height: 1px; background: #e5e5e5; margin-bottom: 1.75rem;"></div>
+
+                <!-- Articles by topic -->
+                {sections}
+
+                <div style="height: 1px; background: #e5e5e5; margin-top: 0.5rem; margin-bottom: 1.5rem;"></div>
+
+                <!-- Footer -->
+                <p style="font-size: 0.75rem; color: #bbb; margin: 0; line-height: 1.6;">
+                    You're receiving this because you subscribed to SysJosh Weekly.<br>
+                    <a href="{unsubscribe_url}" style="color: #bbb;">Unsubscribe</a>
+                </p>
+            </div>
+
+        </div>
+    </body>
+    </html>
     """
     return html
 
