@@ -102,13 +102,10 @@ def build_email_html(articles, token):
         # Fetch og:image
         og_image = get_og_image(url)
 
-        # Skip article if no image
-
         if topic not in topics:
             topics[topic] = []
         topics[topic].append({"title": title, "url": url, "image": og_image})
 
-    # Build topic sections in order
     # Build topic sections in fixed order
     topic_order = ["General Tech", "Infra", "Cloud", "AI"]
 
@@ -128,7 +125,8 @@ def build_email_html(articles, token):
                               font-size: 0.95rem; font-weight: 600; line-height: 1.4;">
                         {item["title"]}
                     </a>
-                    {('<div style="margin-top: 0.6rem;"><a href="' + item["url"] + '"><img src="' + (item["image"] or "") + '" style="width: 100%; max-width: 100%; border-radius: 8px; display: block; border: 1px solid #e5e5e5;"/></a></div>') if item.get("image") else ""}
+                    {('<div style="margin-top: 0.6rem;"><a href="' + item["url"] + '"><img src="' + (item["image"] or "") + '" style="width: 100%; max-width: 100%; border-radius: 8px; '
+                      'display: block; border: 1px solid #e5e5e5;"/></a></div>') if item.get("image") else ""}
                 </div>
             '''
 
