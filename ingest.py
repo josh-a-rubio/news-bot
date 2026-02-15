@@ -24,7 +24,7 @@ NOTION_HEADERS = {
 RSS_HEADERS = {"User-Agent": "Mozilla/5.0"}
 
 # RSS blog feeds
-RSS_FEEDS = RSS_FEEDS = {
+RSS_FEEDS = {
     # General Tech (4)
     "The Verge": "https://www.theverge.com/rss/index.xml",
     "Ars Technica": "https://feeds.arstechnica.com/arstechnica/index",
