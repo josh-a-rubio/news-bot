@@ -6,7 +6,8 @@ A fully automated newsletter system that ingests RSS feeds daily, lets you hand-
 
 ## Demo / Screenshots
 
-> screenshot here
+> <img width="760" height="1375" alt="Screenshot 2026-02-15 at 11 56 00 AM" src="https://github.com/user-attachments/assets/11a4e8f8-7a4b-4694-9c7a-20bce90bc24d" />
+
 
 ---
 
