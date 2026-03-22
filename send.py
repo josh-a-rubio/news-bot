@@ -73,7 +73,7 @@ def get_active_subscribers():
         json={
             "filter": {
                 "property": "Status",
-                "select": { "equals": "active" }
+                "select": { "equals": "Active" }
             }
         }
     )
