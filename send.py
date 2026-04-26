@@ -158,7 +158,7 @@ def build_email_html(articles, token):
                         box-shadow: 0 4px 24px rgba(0,0,0,0.06);
                         display: flex; align-items: center; justify-content: space-between;">
                 <div style="display: flex; align-items: center; gap: 0.75rem;">
-                    <span style="font-size: 1.5rem;">🫙</span>
+                    <span style="font-size: 1.5rem;">☕️</span>
                     <div>
                         <p style="margin: 0; font-size: 1rem; font-weight: 700; 
                                   color: #111; letter-spacing: -0.02em;">
@@ -175,7 +175,7 @@ def build_email_html(articles, token):
 
                 <!-- Intro -->
                 <p style="font-size: 0.95rem; color: #111; margin: 0 0 1.5rem; line-height: 1.6;">
-                    Happy Sunday! Here's this week's picks. ☕
+                    Happy Sunday! Here's this week's picks. 🗞️
                 </p>
 
                 <div style="height: 1px; background: #e5e5e5; margin-bottom: 1.75rem;"></div>

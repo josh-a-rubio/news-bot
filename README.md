@@ -1,4 +1,4 @@
-# 🫙 SysJosh Weekly
+# ☕️ SysJosh Weekly
 
 A fully automated newsletter system that ingests RSS feeds daily, lets you hand-pick articles from a Notion dashboard, and delivers a clean HTML email to subscribers every Sunday at 8am EST.
 
