@@ -25,12 +25,27 @@ RSS_HEADERS = {"User-Agent": "Mozilla/5.0"}
 
 # RSS blog feeds
 RSS_FEEDS = {
-    # General Tech (4)
+    # General Tech (19)
     "The Verge": "https://www.theverge.com/rss/index.xml",
     "Ars Technica": "https://feeds.arstechnica.com/arstechnica/index",
     "TechCrunch": "https://techcrunch.com/feed/",
     "Wired": "https://www.wired.com/feed/rss",
-    
+    "MIT Technology Review": "https://www.technologyreview.com/feed/",
+    "Tech Startups": "https://techstartups.com/feed/",
+    "Fortune Tech": "https://fortune.com/feed/",
+    "MIT Sloan Review": "https://sloanreview.mit.edu/feed/",
+    "VentureBeat": "https://venturebeat.com/feed/",
+    "The Information": "https://www.theinformation.com/feed",
+    "Bloomberg Technology": "https://feeds.bloomberg.com/technology/news.rss",
+    "The Register": "https://www.theregister.com/headlines.atom",
+    "Hacker News": "https://news.ycombinator.com/rss",
+    "NY Times Technology": "https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml",
+    "Business Insider": "https://feeds.feedburner.com/businessinsider",
+    "ZDNet": "https://www.zdnet.com/news/rss.xml",
+    "Mashable": "https://mashable.com/feeds/rss/all",
+    "Engadget": "https://www.engadget.com/rss.xml",
+    "Gizmodo": "https://gizmodo.com/feed/rss",
+
     # Cloud (6)
     "AWS Blog": "https://aws.amazon.com/blogs/aws/feed/",
     "AWS Architecture": "https://aws.amazon.com/blogs/architecture/feed/",
@@ -38,31 +53,64 @@ RSS_FEEDS = {
     "Google Cloud Platform": "https://cloudblog.withgoogle.com/products/gcp/rss",
     "Cloudflare Blog": "https://blog.cloudflare.com/rss/",
     "Fly.io Blog": "https://fly.io/blog/feed.xml",
-    
-    # Infrastructure (6)
+
+    # Infrastructure (8)
     "InfoQ Architecture": "https://feed.infoq.com/architecture-design",
     "Airbnb Engineering": "https://medium.com/feed/airbnb-engineering",
     "Meta Engineering": "https://engineering.fb.com/feed/",
     "Slack Engineering": "https://slack.engineering/feed/",
     "Spotify Engineering": "https://engineering.atspotify.com/feed/",
     "Stripe Engineering": "https://stripe.com/blog/feed.rss",
-    
-    # AI (6)
+    "The New Stack": "https://thenewstack.io/feed/",
+    "DevOps.com": "https://devops.com/feed/",
+
+    # AI (7)
     "OpenAI Blog": "https://openai.com/blog/rss.xml",
     "Google AI Blog": "https://blog.research.google/feeds/posts/default",
     "DeepMind Blog": "https://deepmind.google/blog/rss.xml",
     "Hugging Face Blog": "https://huggingface.co/blog/feed.xml",
     "LangChain Blog": "https://blog.langchain.dev/rss/",
+    "Last Week in AI": "https://lastweekin.ai/feed",
+    "Import AI": "https://jack-clark.net/feed/",
+
+    # Security (7)
+    "Krebs on Security": "https://krebsonsecurity.com/feed/",
+    "Dark Reading": "https://www.darkreading.com/rss.xml",
+    "The Hacker News": "https://feeds.feedburner.com/TheHackersNews",
+    "Schneier on Security": "https://www.schneier.com/feed/atom/",
+    "SANS ISC": "https://isc.sans.edu/rssfeed.xml",
+    "Security Week": "https://feeds.feedburner.com/securityweek",
+    "Bleeping Computer": "https://www.bleepingcomputer.com/feed/",
+
+    # Developer (3)
+    "Stack Overflow Blog": "https://stackoverflow.blog/feed/",
+    "GitHub Blog": "https://github.blog/feed/",
+    "InfoQ": "https://www.infoq.com/feed/",
 }
 
-#Predifined categories as General Tech,Infra, Cloud, or AI
+#Predifined categories as General Tech,Infra, Cloud, or AI (notion topic category)
 FEED_CATEGORIES = {
     # General Tech
     "The Verge": "General Tech",
     "Ars Technica": "General Tech",
     "TechCrunch": "General Tech",
     "Wired": "General Tech",
-    
+    "MIT Technology Review": "General Tech",
+    "Tech Startups": "General Tech",
+    "Fortune Tech": "General Tech",
+    "MIT Sloan Review": "General Tech",
+    "VentureBeat": "General Tech",
+    "The Information": "General Tech",
+    "Bloomberg Technology": "General Tech",
+    "The Register": "General Tech",
+    "Hacker News": "General Tech",
+    "NY Times Technology": "General Tech",
+    "Business Insider": "General Tech",
+    "ZDNet": "General Tech",
+    "Mashable": "General Tech",
+    "Engadget": "General Tech",
+    "Gizmodo": "General Tech",
+
     # Cloud
     "AWS Blog": "Cloud",
     "AWS Architecture": "Cloud",
@@ -70,7 +118,7 @@ FEED_CATEGORIES = {
     "Google Cloud Platform": "Cloud",
     "Cloudflare Blog": "Cloud",
     "Fly.io Blog": "Cloud",
-    
+
     # Infra
     "InfoQ Architecture": "Infra",
     "Airbnb Engineering": "Infra",
@@ -78,18 +126,36 @@ FEED_CATEGORIES = {
     "Slack Engineering": "Infra",
     "Spotify Engineering": "Infra",
     "Stripe Engineering": "Infra",
-    
+    "The New Stack": "Infra",
+    "DevOps.com": "Infra",
+
     # AI
     "OpenAI Blog": "AI",
     "Google AI Blog": "AI",
     "DeepMind Blog": "AI",
     "Hugging Face Blog": "AI",
     "LangChain Blog": "AI",
+    "Last Week in AI": "AI",
+    "Import AI": "AI",
+
+    # Security
+    "Krebs on Security": "General Tech",
+    "Dark Reading": "General Tech",
+    "The Hacker News": "General Tech",
+    "Schneier on Security": "General Tech",
+    "SANS ISC": "General Tech",
+    "Security Week": "General Tech",
+    "Bleeping Computer": "General Tech",
+
+    # Developer
+    "Stack Overflow Blog": "Infra",
+    "GitHub Blog": "General Tech",
+    "InfoQ": "Infra",
 }
 
 # Parse all RSS feeds
 all_entries = []
-MAX_ARTICLES_PER_FEED = 3
+MAX_ARTICLES_PER_FEED = 5
 
 for source_name, feed_url in RSS_FEEDS.items():
     print(f"\nFetching {source_name}...")
